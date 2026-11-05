@@ -1,0 +1,7 @@
+D:\VISUAL STUDIO\проекты\ttlt\bin\Debug\ttlt.exe.config
+D:\VISUAL STUDIO\проекты\ttlt\bin\Debug\ttlt.exe
+D:\VISUAL STUDIO\проекты\ttlt\bin\Debug\ttlt.pdb
+D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.csproj.AssemblyReference.cache
+D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.csproj.CoreCompileInputs.cache
+D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.exe
+D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.pdb
