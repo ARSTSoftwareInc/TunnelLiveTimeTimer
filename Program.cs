@@ -50,7 +50,7 @@ namespace ttlt
 
                 while (true)
                 {
-                    if (I > mtri)
+                    if (I < mtri)
                     {
                         I++;
                         log.info($"Pending tunnel(try count:{I})...");
