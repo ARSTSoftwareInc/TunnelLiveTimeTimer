@@ -13,7 +13,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "";
+        static string domain = "", ver = "0.3";
         static bool isInitialized = false, isDeleteTDFile = false;
 
         static aConfg confg = new aConfg();
@@ -24,8 +24,9 @@ namespace ttlt
             try
             {
                 Console.WriteLine("Initializing tunnel timer host...");
-                confg.init("/home/arst/tunnelConfig.txt");
-                log.init("/home/arst/tunnelLog.txt", "ARST Tunnel");
+                confg.init("/home/arst/ttlt/tunnelConfig.txt");
+                log.init("/home/arst/ttlt/tunnelLog.txt", "ARST Tunnel");
+                log.info($"System by ARST mechanic studio Inc, v{ver}");
                 log.info("Reading configuration...");
                 liveTime = Convert.ToInt32(confg.read("liveTime"));
                 domain = confg.read("domain");
@@ -60,7 +61,8 @@ namespace ttlt
                         log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
                         while (true) { if (File.Exists(tdFile)) break; }
                         string targetDomain = File.ReadAllText(tdFile, Encoding.UTF8);
-                        if (targetDomain.Replace("https://", "") == domain)
+                        log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
+                        if (targetDomain == domain)
                         {
                             log.info($"Tunnel created done: {targetDomain}");
                             if(isDeleteTDFile) File.Delete(tdFile);
@@ -79,7 +81,7 @@ namespace ttlt
                                             if (liveTimerCounter < liveTime)
                                             {
                                                 liveTimerCounter = 0;
-                                                log.info("Timer overcouned: " + liveTime);
+                                                log.info("Timer overcounted: " + liveTime);
                                                 log.info("Restarting tunnel...");
                                                 startTunnel();
                                             }
@@ -103,7 +105,7 @@ namespace ttlt
                         throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
                     }
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1500);
                 }
             }
             catch(Exception ex)
