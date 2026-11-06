@@ -28,6 +28,7 @@ namespace ttlt
                 log.init("/home/arst/ttlt/tunnelLog.txt", "ARST Tunnel");
                 log.autoApplyToFile = true;
                 log.info($"System by ARST mechanic studio Inc, v{ver}");
+                log.info("Initializing started.");
                 log.info("Reading configuration...");
                 liveTime = Convert.ToInt32(confg.read("liveTime"));
                 domain = confg.read("domain");
@@ -94,10 +95,11 @@ namespace ttlt
                                         try
                                         {
                                             liveTimerCounter++;
+                                            if(liveTime <= 500) log.info("Seconds to restart: " + (liveTime - liveTimerCounter).ToString());
                                             if (liveTimerCounter > liveTime)
                                             {
                                                 liveTimerCounter = 0;
-                                                log.info("Timer overcounted: " + liveTime);
+                                                log.info("Timer overflowed: " + liveTime);
                                                 log.info("Restarting tunnel...");
                                                 startTunnel();
                                             }
