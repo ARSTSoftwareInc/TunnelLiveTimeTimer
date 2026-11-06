@@ -26,6 +26,7 @@ namespace ttlt
                 Console.WriteLine("Initializing tunnel timer host...");
                 confg.init("/home/arst/ttlt/tunnelConfig.txt");
                 log.init("/home/arst/ttlt/tunnelLog.txt", "ARST Tunnel");
+                log.autoApplyToFile = true;
                 log.info($"System by ARST mechanic studio Inc, v{ver}");
                 log.info("Reading configuration...");
                 liveTime = Convert.ToInt32(confg.read("liveTime"));
@@ -51,7 +52,7 @@ namespace ttlt
 
                 while (true)
                 {
-                    if (I < mtri)
+                    if (I > mtri)
                     {
                         startProcess("sudo systemctl stop tcService");
                         throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");

@@ -5,3 +5,11 @@ D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.csproj.AssemblyReference.cac
 D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.csproj.CoreCompileInputs.cache
 D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.exe
 D:\VISUAL STUDIO\проекты\ttlt\obj\Debug\ttlt.pdb
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\bin\Debug\ttlt.exe.config
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\bin\Debug\ttlt.exe
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\bin\Debug\ttlt.pdb
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\obj\Debug\ttlt.csproj.AssemblyReference.cache
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\obj\Debug\ttlt.exe.config
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\obj\Debug\ttlt.csproj.CoreCompileInputs.cache
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\obj\Debug\ttlt.exe
+D:\VISUAL STUDIO\проекты\TunnelLiveTimeTimer\obj\Debug\ttlt.pdb
