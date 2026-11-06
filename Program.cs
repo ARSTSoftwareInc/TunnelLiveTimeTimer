@@ -13,7 +13,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_pre";
+        static string domain = "", ver = "0.4_preS1";
         static bool isInitialized = false, isDeleteTDFile = false;
 
         static aConfg confg = new aConfg();
@@ -62,19 +62,17 @@ namespace ttlt
                     {
                         I++;
                         log.info($"Pending tunnel(try count:{I})...");
-                        if (I == 1 && !isInitialized) startProcess("sudo systemctl start arsttunnel");
+                        if (I == 1 && !isInitialized)
+                        {
+                            log.info("Checking for process 'lt'...");
+                            var runningProcs = from proc in Process.GetProcesses(".") orderby proc.Id select proc;
+                            if (runningProcs.Count(p => p.ProcessName.Contains("lt")) == 0) startProcess("sudo systemctl start arsttunnel");
+                        }
                         else startProcess("sudo systemctl restart arsttunnel");
                         string tdFile = "/var/tunnel_url.txt";
                         log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
-                        while (true) 
-                        { 
-                            if (File.Exists(tdFile)) break;
-                            else
-                            {
-                                Thread.Sleep(700);
-                                break;
-                            }
-                        }
+                        while (true) { if (File.Exists(tdFile)) break; }
+                        Thread.Sleep(700);
                         string targetDomain = File.ReadAllText(tdFile, Encoding.UTF8);
                         targetDomain = targetDomain.Trim();
                         log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
