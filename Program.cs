@@ -65,7 +65,15 @@ namespace ttlt
                         else startProcess("sudo systemctl restart arsttunnel");
                         string tdFile = "/var/tunnel_url.txt";
                         log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
-                        while (true) { if (File.Exists(tdFile)) break; }
+                        while (true) 
+                        { 
+                            if (File.Exists(tdFile)) break;
+                            else
+                            {
+                                Thread.Sleep(700);
+                                break;
+                            }
+                        }
                         string targetDomain = File.ReadAllText(tdFile, Encoding.UTF8);
                         targetDomain = targetDomain.Trim();
                         log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
