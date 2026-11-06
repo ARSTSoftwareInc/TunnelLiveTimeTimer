@@ -86,7 +86,7 @@ namespace ttlt
                                         try
                                         {
                                             liveTimerCounter++;
-                                            if (liveTimerCounter < liveTime)
+                                            if (liveTimerCounter > liveTime)
                                             {
                                                 liveTimerCounter = 0;
                                                 log.info("Timer overcounted: " + liveTime);
