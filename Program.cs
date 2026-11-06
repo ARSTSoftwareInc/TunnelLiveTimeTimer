@@ -13,7 +13,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.3";
+        static string domain = "", ver = "0.3_pre";
         static bool isInitialized = false, isDeleteTDFile = false;
 
         static aConfg confg = new aConfg();
@@ -53,6 +53,11 @@ namespace ttlt
                 {
                     if (I < mtri)
                     {
+                        startProcess("sudo systemctl stop tcService");
+                        throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
+                    }
+                    else
+                    {
                         I++;
                         log.info($"Pending tunnel(try count:{I})...");
                         if (I == 1 && !isInitialized) startProcess("sudo systemctl start arsttunnel");
@@ -65,7 +70,7 @@ namespace ttlt
                         if (targetDomain == domain)
                         {
                             log.info($"Tunnel created done: {targetDomain}");
-                            if(isDeleteTDFile) File.Delete(tdFile);
+                            if (isDeleteTDFile) File.Delete(tdFile);
                             if (!isInitialized)
                             {
                                 log.info("First tunnel initialized.");
@@ -74,7 +79,8 @@ namespace ttlt
                                 {
                                     log.info("Pending live timer...");
                                     System.Timers.Timer timer = new System.Timers.Timer(1000);
-                                    timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) => {
+                                    timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
+                                    {
                                         try
                                         {
                                             liveTimerCounter++;
@@ -98,11 +104,7 @@ namespace ttlt
                             }
                             break;
                         }
-                    }
-                    else
-                    {
-                        startProcess("sudo systemctl stop tcService");
-                        throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
+                        else log.info("Domains dont match. Await to rechecking...");
                     }
 
                     Thread.Sleep(1500);
