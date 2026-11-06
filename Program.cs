@@ -13,7 +13,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.3_pre";
+        static string domain = "", ver = "0.4_pre";
         static bool isInitialized = false, isDeleteTDFile = false;
 
         static aConfg confg = new aConfg();
@@ -67,6 +67,7 @@ namespace ttlt
                         log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
                         while (true) { if (File.Exists(tdFile)) break; }
                         string targetDomain = File.ReadAllText(tdFile, Encoding.UTF8);
+                        targetDomain = targetDomain.Trim();
                         log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
                         if (targetDomain == domain)
                         {
