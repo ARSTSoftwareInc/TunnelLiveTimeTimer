@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace ttlt
 {
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preS1";
-        static bool isInitialized = false, isDeleteTDFile = false;
+        static string domain = "", ver = "0.4_preS2";
+        static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
         static ARSTLogAPI log = new ARSTLogAPI();
@@ -32,7 +33,6 @@ namespace ttlt
                 log.info("Reading configuration...");
                 liveTime = Convert.ToInt32(confg.read("liveTime"));
                 domain = confg.read("domain");
-                isDeleteTDFile = Convert.ToBoolean(confg.read("isDeleteTDFile"));
                 log.addToLog($"---\nliveTime={liveTime}\ndomain='{domain}'\n---", false);
                 
                 log.info("Main Initialized!");
@@ -79,7 +79,8 @@ namespace ttlt
                         if (targetDomain == domain)
                         {
                             log.info($"Tunnel created done: {targetDomain}");
-                            if (isDeleteTDFile) File.Delete(tdFile);
+                            File.Delete(tdFile);
+                            File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
                             if (!isInitialized)
                             {
                                 log.info("First tunnel initialized.");
