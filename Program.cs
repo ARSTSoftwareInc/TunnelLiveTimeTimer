@@ -198,6 +198,7 @@ namespace ttlt
         {
             if (isCritic)
             {
+                startProcess("sudo systemctl stop ttlc");
                 log.error($"Internal critic error::{code}: {text}");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Internal critic error::{code}: {text}");
