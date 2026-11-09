@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preI4";
+        static string domain = "", ver = "0.4_preI5";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -55,11 +55,19 @@ namespace ttlt
             return targetDomain;
         }
 
+        static bool isProcLTExists()
+        {
+            log.info("Checking for process 'lt'...");
+            var runningProcs = from proc in Process.GetProcesses(".") orderby proc.Id select proc;
+            if (runningProcs.Count(p => p.ProcessName.Contains("lt")) > 0) return true;
+            return false;
+        }
+
         static bool checkDomain(string tdFile)
         {
             string targetDomain = getTargetDomain(tdFile);
             log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
-            return domain == targetDomain;
+            return domain == targetDomain && isProcLTExists();
         }
 
         static void startTunnel()
@@ -86,9 +94,7 @@ namespace ttlt
                             log.info($"Pending tunnel(try count:{I})...");
                             if (I == 1 && !isInitialized)
                             {
-                                log.info("Checking for process 'lt'...");
-                                var runningProcs = from proc in Process.GetProcesses(".") orderby proc.Id select proc;
-                                if (runningProcs.Count(p => p.ProcessName.Contains("lt")) == 0) startProcess("sudo systemctl start arsttunnel");
+                                if(!isProcLTExists()) startProcess("sudo systemctl start arsttunnel");
                             }
                             else startProcess("sudo systemctl restart arsttunnel");
                             log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
