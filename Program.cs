@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preI8";
+        static string domain = "", ver = "0.4_preI9";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -49,7 +49,7 @@ namespace ttlt
 
         static string getTargetDomain(string tdFile)
         {
-            if (!System.IO.File.Exists(tdFile)) throw new Exception("Target domain file not found on target directory: " + tdFile);
+            if (!System.IO.File.Exists(tdFile)) return "FILE_NOT_FOUND";
             string targetDomain = System.IO.File.ReadAllText(tdFile, Encoding.UTF8);
             targetDomain = targetDomain.Trim();
             return targetDomain;
@@ -76,7 +76,7 @@ namespace ttlt
             {
                 string tdFile = "/var/tmp/tunnel_url.txt";
                 log.info("Checking tunnel...");
-                if (System.IO.File.Exists(tdFile) && checkDomain(tdFile)) tunnelDone(tdFile, getTargetDomain(tdFile), true);
+                if (checkDomain(tdFile)) tunnelDone(tdFile, getTargetDomain(tdFile), true);
                 else
                 {
                     int I = 0, mtri = 5;
