@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.5_preI1";
+        static string domain = "", ver = "0.5_preI2";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -76,7 +76,7 @@ namespace ttlt
             {
                 string tdFile = "/var/tmp/tunnel_url.txt";
                 log.info("Checking tunnel...");
-                if (checkDomain(tdFile)) tunnelDone(tdFile, getTargetDomain(tdFile), true);
+                if (checkDomain(tdFile) && !isInitialized) tunnelDone(tdFile, getTargetDomain(tdFile), true);
                 else
                 {
                     int I = 0, mtri = 5;
