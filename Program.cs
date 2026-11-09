@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preI7";
+        static string domain = "", ver = "0.4_preI8";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -95,8 +95,8 @@ namespace ttlt
                             if (I == 1 && !isInitialized)
                             {
                                 if(!isProcLTExists()) startProcess("sudo systemctl start arsttunnel");
+                                else if(!checkDomain(tdFile)) startProcess("sudo systemctl restart arsttunnel");
                             }
-                            else startProcess("sudo systemctl restart arsttunnel");
                             log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
                             while (true) { if (System.IO.File.Exists(tdFile)) break; }
                             Thread.Sleep(700);
