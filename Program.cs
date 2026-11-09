@@ -1,4 +1,5 @@
 ﻿using ARSTLib;
+using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,13 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using static System.Net.WebRequestMethods;
 
 namespace ttlt
 {
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preS2";
+        static string domain = "", ver = "0.4_preI3";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -45,85 +47,111 @@ namespace ttlt
             }
         }
 
+        static string getTargetDomain(string tdFile)
+        {
+            if (!System.IO.File.Exists(tdFile)) throw new Exception("Target domain file not found on target directory: " + tdFile);
+            string targetDomain = System.IO.File.ReadAllText(tdFile, Encoding.UTF8);
+            targetDomain = targetDomain.Trim();
+            return targetDomain;
+        }
+
+        static bool checkDomain(string tdFile)
+        {
+            string targetDomain = getTargetDomain(tdFile);
+            log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
+            return domain == targetDomain;
+        }
+
         static void startTunnel()
         {
             try
             {
-                int I = 0, mtri = 5;
-
-                while (true)
+                string tdFile = "/var/tunnel_url.txt";
+                log.info("Checking tunnel...");
+                if (checkDomain(tdFile)) tunnelDone(tdFile, getTargetDomain(tdFile), true);
+                else
                 {
-                    if (I > mtri)
+                    int I = 0, mtri = 5;
+
+                    while (true)
                     {
-                        startProcess("sudo systemctl stop tcService");
-                        throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
-                    }
-                    else
-                    {
-                        I++;
-                        log.info($"Pending tunnel(try count:{I})...");
-                        if (I == 1 && !isInitialized)
+                        if (I > mtri)
                         {
-                            log.info("Checking for process 'lt'...");
-                            var runningProcs = from proc in Process.GetProcesses(".") orderby proc.Id select proc;
-                            if (runningProcs.Count(p => p.ProcessName.Contains("lt")) == 0) startProcess("sudo systemctl start arsttunnel");
+                            startProcess("sudo systemctl stop ttlc");
+                            throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
                         }
-                        else startProcess("sudo systemctl restart arsttunnel");
-                        string tdFile = "/var/tunnel_url.txt";
-                        log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
-                        while (true) { if (File.Exists(tdFile)) break; }
-                        Thread.Sleep(700);
-                        string targetDomain = File.ReadAllText(tdFile, Encoding.UTF8);
-                        targetDomain = targetDomain.Trim();
-                        log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
-                        if (targetDomain == domain)
+                        else
                         {
-                            log.info($"Tunnel created done: {targetDomain}");
-                            File.Delete(tdFile);
-                            File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
-                            if (!isInitialized)
+                            I++;
+                            log.info($"Pending tunnel(try count:{I})...");
+                            if (I == 1 && !isInitialized)
                             {
-                                log.info("First tunnel initialized.");
-                                isInitialized = true;
-                                new Thread(() =>
-                                {
-                                    log.info("Pending live timer...");
-                                    System.Timers.Timer timer = new System.Timers.Timer(1000);
-                                    timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
-                                    {
-                                        try
-                                        {
-                                            liveTimerCounter++;
-                                            if(liveTime <= 500) log.info("Seconds to restart: " + (liveTime - liveTimerCounter).ToString());
-                                            if (liveTimerCounter > liveTime)
-                                            {
-                                                liveTimerCounter = 0;
-                                                log.info("Timer overflowed: " + liveTime);
-                                                log.info("Restarting tunnel...");
-                                                startTunnel();
-                                            }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            timer.Stop();
-                                            error(ex.Message, "LIVE_TIMER_ERROR");
-                                        }
-                                    };
-
-                                    timer.Start();
-                                }).Start();
+                                log.info("Checking for process 'lt'...");
+                                var runningProcs = from proc in Process.GetProcesses(".") orderby proc.Id select proc;
+                                if (runningProcs.Count(p => p.ProcessName.Contains("lt")) == 0) startProcess("sudo systemctl start arsttunnel");
                             }
-                            break;
+                            else startProcess("sudo systemctl restart arsttunnel");
+                            log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
+                            while (true) { if (System.IO.File.Exists(tdFile)) break; }
+                            Thread.Sleep(700);
+                            string targetDomain = getTargetDomain(tdFile);
+                            if (checkDomain(tdFile))
+                            {
+                                tunnelDone(tdFile, targetDomain);
+                                break;
+                            }
+                            else log.info("Domains dont match. Await to rechecking...");
                         }
-                        else log.info("Domains dont match. Await to rechecking...");
-                    }
 
-                    Thread.Sleep(1500);
+                        Thread.Sleep(1500);
+                    }
                 }
             }
             catch(Exception ex)
             {
                 error(ex.Message, "START_TUNNEL_ERROR");
+            }
+        }
+
+        static void tunnelDone(string tdFile, string targetDomain, bool already = false)
+        {
+            if(already) log.info($"Tunnel created done: {targetDomain}");
+            else log.info("Tunnel already created: " + targetDomain);
+
+            System.IO.File.Delete(tdFile);
+            System.IO.File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
+            
+            if (!isInitialized)
+            {
+                log.info("First tunnel initialized.");
+                isInitialized = true;
+                new Thread(() =>
+                {
+                    log.info("Pending live timer...");
+                    System.Timers.Timer timer = new System.Timers.Timer(1000);
+                    timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
+                    {
+                        try
+                        {
+                            liveTimerCounter++;
+                            if (liveTime <= 500) log.info("Seconds to restart: " + (liveTime - liveTimerCounter).ToString());
+                            if (liveTimerCounter > liveTime)
+                            {
+                                liveTimerCounter = 0;
+                                log.info("Timer overflowed: " + liveTime);
+                                log.info("Restarting tunnel...");
+                                startTunnel();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            timer.Stop();
+                            error(ex.Message, "LIVE_TIMER_ERROR");
+                        }
+                    };
+
+                    timer.Start();
+                }).Start();
             }
         }
 
