@@ -107,9 +107,10 @@ namespace ttlt
                                 break;
                             }
                             else log.info("Domains dont match. Await to rechecking...");
+                            startProcess("sudo rm " + tdFile);
                         }
 
-                        Thread.Sleep(1500);
+                        Thread.Sleep(10500);
                     }
                 }
             }
@@ -124,7 +125,6 @@ namespace ttlt
             if(already) log.info($"Tunnel already created done: {targetDomain}");
             else log.info("Tunnel created done: " + targetDomain);
 
-            startProcess("sudo rm " + tdFile);
             System.IO.File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
             
             if (!isInitialized)
