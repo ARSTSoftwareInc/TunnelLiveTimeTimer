@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.5_preI2";
+        static string domain = "", ver = "0.5_preI3";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -139,6 +139,7 @@ namespace ttlt
                 new Thread(() =>
                 {
                     log.info("Pending live timer...");
+                    if(liveTime > 500) log.info("Counting live timer...");
                     System.Timers.Timer timer = new System.Timers.Timer(1000);
                     timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
                     {
