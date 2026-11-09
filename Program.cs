@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.4_preI3";
+        static string domain = "", ver = "0.4_preI4";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -115,10 +115,10 @@ namespace ttlt
 
         static void tunnelDone(string tdFile, string targetDomain, bool already = false)
         {
-            if(already) log.info($"Tunnel created done: {targetDomain}");
-            else log.info("Tunnel already created: " + targetDomain);
+            if(already) log.info($"Tunnel already created done: {targetDomain}");
+            else log.info("Tunnel created done: " + targetDomain);
 
-            System.IO.File.Delete(tdFile);
+            startProcess("sudo rm " + tdFile);
             System.IO.File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
             
             if (!isInitialized)
