@@ -16,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.5_preI3";
+        static string domain = "", ver = "0.5_preI4";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -94,14 +94,11 @@ namespace ttlt
                             log.info($"Pending tunnel(try count:{I})...");
                             if (I == 1 && !isInitialized)
                             {
-                                if(!isProcLTExists()) startProcess("sudo systemctl start arsttunnel");
-                                if (!checkDomain(tdFile)) startProcess("sudo systemctl restart arsttunnel");
+                                if (!isProcLTExists()) startProcess("sudo systemctl start arsttunnel");
+                                else if (!checkDomain(tdFile)) restartTunnel();
                             }
-                            else
-                            {
-                                log.info("Restarting tunnel...");
-                                startProcess("sudo systemctl restart arsttunnel");
-                            }
+                            else restartTunnel();
+
                             log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
                             while (true) { if (System.IO.File.Exists(tdFile)) break; }
                             Thread.Sleep(700);
@@ -123,6 +120,12 @@ namespace ttlt
             {
                 error(ex.Message, "START_TUNNEL_ERROR");
             }
+        }
+
+        static void restartTunnel()
+        {
+            log.info("Restarting tunnel...");
+            startProcess("sudo systemctl restart arsttunnel");
         }
 
         static void tunnelDone(string tdFile, string targetDomain, bool already = false)
