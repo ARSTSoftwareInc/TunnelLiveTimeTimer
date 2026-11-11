@@ -1,5 +1,4 @@
 ﻿using ARSTLib;
-using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +15,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.5_preI4";
+        static string domain = "", ver = "0.5_preI5";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -74,7 +73,7 @@ namespace ttlt
         {
             try
             {
-                string tdFile = "/var/tmp/tunnel_url.txt";
+                string tdFile = "/var/tmp/tdf/tunnel_url.txt";
                 log.info("Checking tunnel...");
                 if (checkDomain(tdFile) && !isInitialized) tunnelDone(tdFile, getTargetDomain(tdFile), true);
                 else
@@ -102,17 +101,16 @@ namespace ttlt
                             log.info($"Tunnel data awaiting... [tdFile='{tdFile}']");
                             while (true) { if (System.IO.File.Exists(tdFile)) break; }
                             Thread.Sleep(700);
-                            string targetDomain = getTargetDomain(tdFile);
                             if (checkDomain(tdFile))
                             {
-                                tunnelDone(tdFile, targetDomain);
+                                tunnelDone(tdFile, getTargetDomain(tdFile));
                                 break;
                             }
                             else log.info("Domains dont match. Await to rechecking...");
                             startProcess("sudo rm " + tdFile);
                         }
 
-                        Thread.Sleep(10500);
+                        Thread.Sleep(10500); // Ожидание 10 секунд и 500 мс перед новой итерацией перезапуска тоннеля
                     }
                 }
             }
