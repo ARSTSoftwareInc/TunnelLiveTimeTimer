@@ -15,7 +15,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.5_preI5";
+        static string domain = "", ver = "0.6";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
