@@ -14,8 +14,8 @@ namespace ttlt
 {
     internal class Program
     {
-        static int liveTime = 0, liveTimerCounter = 0;
-        static string domain = "", ver = "0.6";
+        static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0;
+        static string domain = "", ver = "0.7_preI1";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -147,7 +147,18 @@ namespace ttlt
                         try
                         {
                             liveTimerCounter++;
+                            
                             if (liveTime <= 500) log.info("Seconds to restart: " + (liveTime - liveTimerCounter).ToString());
+                            else
+                            {
+                                int currentHour = liveTimerCounter / 60;
+                                if (lastCheckHour != currentHour)
+                                {
+                                    lastCheckHour = currentHour;
+                                    log.info($"Timer hour counted({liveTimerCounter}:{currentHour})");
+                                }
+                            }
+
                             if (liveTimerCounter > liveTime)
                             {
                                 liveTimerCounter = 0;
