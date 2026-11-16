@@ -15,7 +15,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0;
-        static string domain = "", ver = "0.7_preI2";
+        static string domain = "", ver = "0.7_preI3";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -90,6 +90,9 @@ namespace ttlt
                         else
                         {
                             I++;
+                            log.info("Pre-deleting: " + tdFile);
+                            startProcess("sudo rm " + tdFile);
+                            Thread.Sleep(440);
                             log.info($"Pending tunnel(try count:{I})...");
                             if (I == 1 && !isInitialized)
                             {
