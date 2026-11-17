@@ -15,7 +15,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0;
-        static string domain = "", ver = "0.7_preI5";
+        static string domain = "", ver = "0.7_preI6";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -56,8 +56,8 @@ namespace ttlt
 
         static bool isProcLTExists()
         {
-            log.info("Checking for process 'lt' ...");
-            var processes = Process.GetProcessesByName("lt");
+            log.info("Checking for process 'node' ...");
+            var processes = Process.GetProcessesByName("node");
             try 
             {
                 bool exists = processes.Length > 0;
