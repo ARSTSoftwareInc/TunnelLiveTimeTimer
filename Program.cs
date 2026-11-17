@@ -14,8 +14,8 @@ namespace ttlt
 {
     internal class Program
     {
-        static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0;
-        static string domain = "", ver = "0.7_preI6";
+        static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0, maxTunnelRestartCount = 5;
+        static string domain = "", ver = "0.8";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -34,6 +34,7 @@ namespace ttlt
                 log.info("Reading configuration...");
                 liveTime = Convert.ToInt32(confg.read("liveTime"));
                 domain = confg.read("domain");
+                maxTunnelRestartCount = Convert.ToInt32(confg.read("maxTRC"));
                 log.addToLog($"---\nliveTime={liveTime}\ndomain='{domain}'\n---", false);
                 
                 log.info("Main Initialized!");
@@ -72,7 +73,7 @@ namespace ttlt
         static bool checkDomain(string tdFile)
         {
             string targetDomain = getTargetDomain(tdFile);
-            log.info($"Verifying domains... [domain='{domain}', targetDomain='{targetDomain}']");
+            log.info($"Verifying domains and checking tunnel process... [domain='{domain}', targetDomain='{targetDomain}']");
             return domain == targetDomain && isProcLTExists();
         }
 
@@ -85,20 +86,19 @@ namespace ttlt
                 if (checkDomain(tdFile) && !isInitialized) tunnelDone(tdFile, getTargetDomain(tdFile), true);
                 else
                 {
-                    int I = 0, mtri = 5;
+                    int I = 0;
 
                     while (true)
                     {
-                        if (I > mtri)
+                        if (I > maxTunnelRestartCount)
                         {
                             startProcess("sudo systemctl stop ttlc");
-                            throw new Exception($"Tunnel restart overcount! [domain='{domain}', I={I}]");
+                            throw new Exception($"Tunnel restart overflow! [domain='{domain}', I={I}]");
                         }
                         else
                         {
                             I++;
-                            log.info("Pre-deleting: " + tdFile);
-                            startProcess("sudo rm " + tdFile);
+                            tdFileDel(tdFile);
                             Thread.Sleep(440);
                             log.info($"Pending tunnel(try count:{I})...");
                             if (I == 1 && !isInitialized)
@@ -117,7 +117,6 @@ namespace ttlt
                                 break;
                             }
                             else log.info("Domains dont match. Await to rechecking...");
-                            startProcess("sudo rm " + tdFile);
                         }
 
                         Thread.Sleep(10500); // Ожидание 10 секунд и 500 мс перед новой итерацией перезапуска тоннеля
@@ -128,6 +127,12 @@ namespace ttlt
             {
                 error(ex.Message, "START_TUNNEL_ERROR");
             }
+        }
+
+        static void tdFileDel(string tdFile)
+        {
+            log.info($"Deleting tunnel data file... [tdFile='{tdFile}']");
+            startProcess("sudo rm " + tdFile);
         }
 
         static void restartTunnel()
@@ -141,6 +146,7 @@ namespace ttlt
             if(already) log.info($"Tunnel already created done: {targetDomain}");
             else log.info("Tunnel created done: " + targetDomain);
 
+            tdFileDel(tdFile);
             System.IO.File.WriteAllText(Path.Combine(Path.GetDirectoryName(tdFile), "tdf.txt"), targetDomain);
             
             if (!isInitialized)
