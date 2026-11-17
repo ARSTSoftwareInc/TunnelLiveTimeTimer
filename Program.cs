@@ -61,8 +61,8 @@ namespace ttlt
             try 
             {
                 bool exists = processes.Length > 0;
-                if(exists) log.info("Process lt exists.");
-                else log.info("Process lt not exists.");
+                if(exists) log.info("Process exists.");
+                else log.info("Process not exists.");
 
                 return exists; 
             }
