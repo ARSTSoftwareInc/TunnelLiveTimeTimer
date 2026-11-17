@@ -15,7 +15,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0;
-        static string domain = "", ver = "0.7_preI4";
+        static string domain = "", ver = "0.7_preI5";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -58,7 +58,14 @@ namespace ttlt
         {
             log.info("Checking for process 'lt' ...");
             var processes = Process.GetProcessesByName("lt");
-            try { return processes.Length > 0; }
+            try 
+            {
+                bool exists = processes.Length > 0;
+                if(exists) log.info("Process lt exists.");
+                else log.info("Process lt not exists.");
+
+                return exists; 
+            }
             finally { foreach (var proc in processes) { proc.Dispose(); } }
         }
 
