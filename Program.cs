@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace ttlt
     internal class Program
     {
         static int liveTime = 0, liveTimerCounter = 0, lastCheckHour = 0, maxTunnelRestartCount = 5;
-        static string domain = "", ver = "0.8";
+        static string domain = "", ver = "0.9_preI1";
         static bool isInitialized = false;
 
         static aConfg confg = new aConfg();
@@ -25,21 +26,50 @@ namespace ttlt
         {
             try
             {
-                Console.WriteLine("Initializing tunnel timer host...");
-                confg.init("/home/arst/ttlt/tunnelConfig.txt");
-                log.init("/home/arst/ttlt/tunnelLog.txt", "ARST Tunnel");
-                log.autoApplyToFile = true;
-                log.info($"System by ARST mechanic studio Inc, v{ver}");
-                log.info("Initializing started.");
-                log.info("Reading configuration...");
-                liveTime = Convert.ToInt32(confg.read("liveTime"));
-                domain = confg.read("domain");
-                maxTunnelRestartCount = Convert.ToInt32(confg.read("maxTRC"));
-                log.addToLog($"---\nliveTime={liveTime}\ndomain='{domain}'\n---", false);
-                
-                log.info("Main Initialized!");
-                new Thread(() => { startTunnel(); }).Start();
-                while (true) Thread.Sleep(1000);
+                Console.WriteLine($"Initializing tunnel timer host v{ver} ...");
+                if (args.Length == 0)
+                {
+                    Console.WriteLine("\n*** Arguments list empty ***\n");
+                    confg.init("/home/arst/ttlt/tunnelConfig.txt");
+                    log.init("/home/arst/ttlt/tunnelLog.txt", "ARST Tunnel");
+                    log.autoApplyToFile = true;
+                    log.info($"System by ARST mechanic studio Inc, (C) 2026");
+                    log.info($"System version: {ver}\n");
+                    log.info("Initializing started.");
+                    log.info("Reading configuration...");
+                    liveTime = Convert.ToInt32(confg.read("liveTime"));
+                    domain = confg.read("domain");
+                    maxTunnelRestartCount = Convert.ToInt32(confg.read("maxTRC"));
+                    log.addToLog($"---\nliveTime={liveTime}\ndomain='{domain}'\n---", false);
+
+                    log.info("Main Initialized!");
+                    new Thread(() => { startTunnel(); }).Start();
+                    while (true) Thread.Sleep(1000);
+                }
+                else
+                {
+                    string arg = args[0];
+                    Console.WriteLine("Typed: " + arg);
+                    switch (arg)
+                    {
+                        case "help":
+                            Console.WriteLine("\n+++ Commands help +++\nhelp - entering help for commands;\n-restartTunnel - restarts tunnel and reset timer");
+                            break;
+                        case "restartTunnel":
+                            Console.WriteLine("Initiating tunnel restart...");
+                            Console.WriteLine("Stoping arsttunnel...");
+                            Process.Start("sudo","systemctl stop arsttunnel");
+                            Thread.Sleep(400);
+                            Process.Start("systemctl", "status arsttunnel");
+                            Console.WriteLine("\nRestarting ttlc...");
+                            Process.Start("sudo", "systemctl restart ttlc");
+                            Thread.Sleep(400);
+                            Process.Start("systemctl", "status ttlc");
+                            break;
+                    }
+
+                    Console.WriteLine("\n\nDone!");
+                }
             }
             catch(Exception ex)
             {
@@ -219,7 +249,7 @@ namespace ttlt
                     };
 
                     using (Process process = new Process { StartInfo = startInfo }) { process.Start(); }
-                    log.info("Process started!");
+                    log.info("Process started: " + name);
                 }
                 catch (Exception ex)
                 {
