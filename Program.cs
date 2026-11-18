@@ -59,7 +59,8 @@ namespace ttlt
                             Console.WriteLine("Initiating tunnel restart...");
                             Console.WriteLine("Stoping arsttunnel...");
                             Process.Start("sudo","systemctl stop arsttunnel");
-                            Thread.Sleep(400);
+                            Console.WriteLine("Awaiting 600 ms...");
+                            Thread.Sleep(600);
                             Process.Start("systemctl", "status arsttunnel");
                             Console.WriteLine("\nRestarting ttlc...");
                             Process.Start("sudo", "systemctl restart ttlc");
@@ -92,8 +93,8 @@ namespace ttlt
             try 
             {
                 bool exists = processes.Length > 0;
-                if(exists) log.info("Process exists.");
-                else log.info("Process not exists.");
+                if(exists) log.info("Process 'node' exists.");
+                else log.info("Process 'node' not exists.");
 
                 return exists; 
             }
